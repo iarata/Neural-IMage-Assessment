@@ -15,10 +15,26 @@ class NIMA(nn.Module):
     def __init__(self, base_model, num_classes=10):
         super(NIMA, self).__init__()
         self.features = base_model.features
+        
+        # remove last layer of base_model
+        # self.features = nn.Sequential(*list(self.features.children())[:-1])
+        
+        # freeze self.features
+        # for p in self.features.parameters():
+        #     p.requires_grad = False
+        
+        
+        
         self.classifier = nn.Sequential(
-            nn.Dropout(p=0.75),
-            nn.Linear(in_features=25088, out_features=num_classes),
-            nn.Softmax())
+            # nn.Dropout(p=0.75),
+            # nn.Linear(100352, 1024),
+            nn.Linear(25088, 512),
+            nn.Softmax(),
+            nn.Linear(512, 256),
+            nn.Softmax(),
+            nn.Linear(256, num_classes),
+            nn.Softmax()
+        )
 
     def forward(self, x):
         out = self.features(x)
